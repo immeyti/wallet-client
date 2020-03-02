@@ -1,0 +1,41 @@
+{
+    "name": "immeyti/wallet-client",
+    "description": "A description for wallet-client.",
+    "type": "package",
+    "license": "MIT",
+    "keywords": [
+        "laravel"
+    ],
+    "authors": [
+        {
+            "name": "mehdi samirakh",
+            "email": "mehdi.samirakh68@gmail.com"
+        }
+    ],
+    "require": {
+        "illuminate/support": "^6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Immeyti\\WalletClient\\": "./src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Immeyti\\WalletClient\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Immeyti\\WalletClient\\WalletClientServiceProvider"
+            ]
+        }
+    },
+    "require-dev": {
+        "orchestra/testbench": "^4.0"
+    }
+}
