@@ -26,15 +26,24 @@ class WalletTest extends \Tests\TestCase
     /** @test */
     public function itShouldReturnAnExceptionMessageIfRequestFailed()
     {
-        $wallet = new Wallet();
+        $this->fakeGuzzleFailResponse();
 
-        $response = $wallet->request('https://dog.ceo/api/breeds/list/test', 'GET');
+        $wallet = new Wallet();
+        $response = $wallet->request('https://dog.ceo/api/breeds/list/sdf', 'POST');
 
         $this->assertTrue(is_array($response));
         $this->assertTrue(key_exists('message', $response));
     }
 
+    /** @test */
+    public function itShouldReturnAnArrayOfAllTransactions()
+    {
 
+        $wallet = new Wallet();
+        $allTransactions = $wallet->allTransactions();
+
+        $this->assertTrue(count($allTransactions) > 0);
+    }
 
     public function fakeGuzzleSuccessResponse()
     {
@@ -44,6 +53,11 @@ class WalletTest extends \Tests\TestCase
     public function fakeGuzzleFailResponse()
     {
         $expectedResponseBody = file_get_contents(__DIR__.'/stub/jsonTest.json');
+        $this->appendToHandler(400 , [], $expectedResponseBody);
+    }
+    public function fakeGuzzleTransactionsResponse()
+    {
+        $expectedResponseBody = file_get_contents(__DIR__.'/stub/transactions.json');
         $this->appendToHandler(400 , [], $expectedResponseBody);
     }
 }
