@@ -9,50 +9,72 @@ use GuzzleHttp\Psr7\Response;
 
 class Wallet
 {
-    public function request($endpoint, $method = 'GET', $body = '', $headers = [])
+    public function request($endpoint, $method = 'GET', $body = '')
     {
+        /** @var Client $client */
+        $client = app(Client::class);
+
+        /** @var Response $response */
+        $response = $client->request($method, $endpoint, [
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ],
+            'body' => $body
+        ]);
+
+        $response = json_decode($response->getBody(), true);
+
+
+        if (key_exists('errors', $response))
+            throw new \Exception($response['errors'][0]['message']);
+
+        /*if (key_exists(0, $response) and key_exists('errors', $response[0]))
+            throw new \Exception($response[0]['errors'][0]['message']);*/
+
+        return $response;
+    }
+
+    /**
+     * @param null|string $accountUuid
+     * @return array|Response|mixed
+     */
+    public function allTransactions($accountUuid = null)
+    {
+        //(where: {column: UUID, operator: EQ, value: \"b52982ba-864e-3c94-bdf6-19460a109fa7\"})
+        $graphQLquery = '{"query": "query { allTransactions { uuid id type for amount action_type created_at} } "}';
+
         try {
-            /** @var Client $client */
-            $client = app(Client::class);
+            $response = $this->request('wallet.test/graphql', 'POST', $graphQLquery);
 
-            /** @var Response $response */
-            $response = $client->request($method, $endpoint, [
-                'headers' => [
-                    'Content-Type' => 'application/json'
-                ],
-                'body' => $body
-            ]);
+            return $response['data']['allTransactions'];
 
-            $response = json_decode($response->getBody(), true);
-
-            if (key_exists('errors', $response))
-                throw new \Exception($response['message']);
-
-            return $response;
         } catch (\Exception $e) {
-            return [
+            return  [
                 'message' => $e->getMessage()
             ];
         }
     }
 
-    public function allTransactions()
+    public function account($uuid)
     {
-        $graphQLquery = '{"query": "query {
-  allTransactions(
-    where: {column: UUID, operator: EQ, value: "b52982ba-864e-3c94-bdf6-19460a109fa7"}
-  ) {
-    	uuid
-    	id
-      type
-      for
-      amount
-      action_type
-      created_at
-  }
-} "}';
+        $graphQLquery = '{"query": "query { allAccounts(where: {column: UUID, operator: EQ, value: $uuid}) { uuid id user_id coin_type balance blocked_balance created_at transactions { id type for amount action_type created_at }} } "}';
+        $graphQLquery = str_replace('$uuid', '\"'.$uuid.'\"', $graphQLquery);
 
+        try {
+            $response = $this->request('wallet.test/graphql', 'POST', $graphQLquery);
 
-        return $this->request('wallet.test/graphql', 'POST', $graphQLquery);
+            $account = $response['data']['allAccounts'];
+
+            if (empty($account))
+                throw new \Exception('account not found');
+
+            return $account[0];
+
+        } catch (\Exception $e) {
+            return  [
+                'error' => true,
+                'message' => $e->getMessage()
+            ];
+        }
     }
 }
