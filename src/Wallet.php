@@ -40,7 +40,6 @@ class Wallet
      */
     public function allTransactions($accountUuid = null)
     {
-        //(where: {column: UUID, operator: EQ, value: \"b52982ba-864e-3c94-bdf6-19460a109fa7\"})
         $graphQLquery = '{"query": "query { allTransactions { uuid id type for amount action_type created_at} } "}';
 
         try {
@@ -70,6 +69,24 @@ class Wallet
 
             return $account[0];
 
+        } catch (\Exception $e) {
+            return  [
+                'error' => true,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    public function transactionsBetween($from, $to)
+    {
+        $graphQLquery = '{"query": "query { allTransactions(where: { AND:[{column: CREATEDAT, operator: GT value: $from } { column: CREATEDAT, operator: LT value: $to }]}) { uuid id type for amount action_type created_at} } "}';
+        $graphQLquery = str_replace('$from', '\"'.$from.'\"', $graphQLquery);
+        $graphQLquery = str_replace('$to', '\"'.$to.'\"', $graphQLquery);
+
+        try {
+            $response = $this->request('wallet.test/graphql', 'POST', $graphQLquery);
+
+           return $response['data']['allTransactions'];
         } catch (\Exception $e) {
             return  [
                 'error' => true,

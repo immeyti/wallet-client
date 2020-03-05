@@ -3,6 +3,7 @@
 
 namespace Immeyti\WalletClient\Tests;
 
+use Illuminate\Support\Carbon;
 use Immeyti\WalletClient\Tests\FakeGuzzleClientResponses;
 use Immeyti\WalletClient\Wallet;
 
@@ -86,6 +87,22 @@ class WalletTest extends \Tests\TestCase
         $this->assertEquals('account not found', $response['message']);
     }
 
+    /** @test */
+    public function itShouldReturnAllTransactionsInAPeriodOfDate()
+    {
+        $this->fakeGuzzleTransactionBetweenAPeriodDate();
+
+        $from = '2020-02-04 13:43:09';
+        $to = '2020-03-19 00:00:00';
+
+        $response = $this->wallet->transactionsBetween($from, $to);
+
+        $this->assertIsArray($response);
+
+        $this->assertLessThanInArrat($response, 'created_at', $from);
+        $this->assertGreaterThanInArrat($response, 'created_at', $to);
+    }
+
     public function fakeGuzzleSuccessResponse()
     {
         $expectedResponseBody = file_get_contents(__DIR__.'/stub/jsonTest.json');
@@ -101,22 +118,38 @@ class WalletTest extends \Tests\TestCase
         $expectedResponseBody = file_get_contents(__DIR__.'/stub/transactions.json');
         $this->appendToHandler(200 , [], $expectedResponseBody);
     }
-
     public function fakeGuzzleAnAccountResponse()
     {
         $expectedResponseBody = file_get_contents(__DIR__.'/stub/account.json');
         $this->appendToHandler(200 , [], $expectedResponseBody);
     }
-
     public function fakeGuzzleAnAccountNotFoundResponse()
     {
         $expectedResponseBody = file_get_contents(__DIR__.'/stub/accountNotFound.json');
         $this->appendToHandler(200 , [], $expectedResponseBody);
     }
-
+    public function fakeGuzzleTransactionBetweenAPeriodDate()
+    {
+        $expectedResponseBody = file_get_contents(__DIR__.'/stub/transactionsBetweenDate.json');
+        $this->appendToHandler(200 , [], $expectedResponseBody);
+    }
     public function fakeGuzzleFailGraphqlResponse()
     {
         $expectedResponseBody = file_get_contents(__DIR__.'/stub/graphqlError.json');
         $this->appendToHandler(200 , [], $expectedResponseBody);
+    }
+
+    protected function assertLessThanInArrat($array, $key, $actual)
+    {
+        (collect($array))->map(function ($item) use ($key, $actual){
+            $this->assertLessThan($item[$key], $actual);
+        });
+    }
+
+    protected function assertGreaterThanInArrat($array, $key, $actual)
+    {
+        (collect($array))->map(function ($item) use ($key, $actual){
+            $this->assertGreaterThan($item[$key], $actual);
+        });
     }
 }
