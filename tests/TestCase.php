@@ -18,7 +18,7 @@ class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
-            \Asdf\Test\TestServiceProvider::class,
+            \Immeyti\WalletClient\WalletClientServiceProvider::class,
         ];
     }
 
