@@ -11,7 +11,7 @@ class WalletTest extends TestCase
 {
     use FakeGuzzleClientResponses;
 
-    public Wallet $wallet;
+    public $wallet;
 
     public function __construct($name = null, array $data = [], $dataName = '')
     {
