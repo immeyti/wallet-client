@@ -155,6 +155,26 @@ class WalletTest extends \Tests\TestCase
             'blocked_balance' => 0
         ]);
     }
+
+    /** @test */
+    public function itShouldSendWithdrawRequest()
+    {
+        $this->fakeGuzzleDepositResponse();
+        $userId = 1;
+        $coinType = 'BTC';
+        $amount = 0.001;
+
+        $response = $this->wallet->withdraw($userId, $coinType, $amount);
+
+        $this->assertIsArray($response);
+        $this->assertSame($response, [
+            'user_id' => $userId,
+            'coin_type' => $coinType,
+            'balance' => $amount,
+            'blocked_balance' => 0
+        ]);
+    }
+
     public function fakeGuzzleSuccessResponse()
     {
         $expectedResponseBody = file_get_contents(__DIR__.'/stub/jsonTest.json');

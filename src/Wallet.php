@@ -127,4 +127,23 @@ class Wallet
             ];
         }
     }
+
+    public function withdraw($userId, $coinType, $amount)
+    {
+        $endPoint = 'wallet.test/api/v1/accounts/withdraw';
+        $params = [
+            'user_id' => $userId,
+            'coin_type' => $coinType,
+            'amount' => $amount
+        ];
+
+        try {
+            return $this->request($endPoint, 'POST', $params, 'rest');
+        }catch (\Exception $e) {
+            return [
+                'error' => true,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
 }
