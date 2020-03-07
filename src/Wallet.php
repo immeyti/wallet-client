@@ -9,7 +9,7 @@ use GuzzleHttp\Psr7\Response;
 
 class Wallet
 {
-    public function request($endpoint, $method = 'GET', $body = '')
+    private function request($endpoint, $method = 'GET', $body = '')
     {
         /** @var Client $client */
         $client = app(Client::class);
@@ -28,19 +28,22 @@ class Wallet
         if (key_exists('errors', $response))
             throw new \Exception($response['errors'][0]['message']);
 
-        /*if (key_exists(0, $response) and key_exists('errors', $response[0]))
-            throw new \Exception($response[0]['errors'][0]['message']);*/
+        if (key_exists(0, $response) and key_exists('errors', $response[0]))
+            throw new \Exception($response[0]['errors'][0]['message']);
 
         return $response;
     }
 
     /**
-     * @param null|string $accountUuid
+     * @param string|null $conditions
      * @return array|Response|mixed
      */
-    public function allTransactions($accountUuid = null)
+    public function allTransactions($conditions = null)
     {
-        $graphQLquery = '{"query": "query { allTransactions { uuid id type for amount action_type created_at} } "}';
+        $baseQuery = '{"query": "query { allTransactions { uuid id type for amount action_type created_at} } "}';
+        $graphQLquery = $conditions
+            ? str_replace('$conditions', $conditions,'{"query": "query { allTransactions ($conditions) { uuid id type for amount action_type created_at} } "}')
+            : $baseQuery;
 
         try {
             $response = $this->request('wallet.test/graphql', 'POST', $graphQLquery);
@@ -49,6 +52,7 @@ class Wallet
 
         } catch (\Exception $e) {
             return  [
+                'error' => true,
                 'message' => $e->getMessage()
             ];
         }

@@ -47,6 +47,19 @@ class WalletTest extends \Tests\TestCase
     }
 
     /** @test */
+    public function itCanGetManualQueryForAllTransactions()
+    {
+        $this->fakeGuzzleTransactionsResponse();
+        $query = 'where: {column: UUID, operator: EQ, value: \"b52982ba-864e-3c94-bdf6-19460a109fa7\"}';
+
+        $wallet = new Wallet();
+        $allTransactions = $wallet->allTransactions($query);
+
+        $this->assertTrue(is_array($allTransactions));
+        $this->assertArrayNotHasKey('error', $allTransactions);
+    }
+
+    /** @test */
     public function itShouldReturnErrorMessageWhenFailedAllTransactiosGraphqlRequest()
     {
         $this->fakeGuzzleFailGraphqlResponse();
@@ -101,6 +114,23 @@ class WalletTest extends \Tests\TestCase
 
         $this->assertLessThanInArrat($response, 'created_at', $from);
         $this->assertGreaterThanInArrat($response, 'created_at', $to);
+    }
+
+    /** @test */
+    public function itShouldReturnErrorIfAllTransactionsInAPeriodOfDateFailed()
+    {
+        $this->fakeGuzzleFailResponse();
+
+        $from = '2020-02-04 13:43:09';
+        $to = '2020-03-19 00:00:00';
+
+        $response = $this->wallet->transactionsBetween($from, $to);
+
+        $this->assertIsArray($response);
+
+        $this->assertArrayHasKey('error', $response);
+        $this->assertArrayHasKey('message', $response);
+        $this->assertTrue($response['error']);
     }
 
     public function fakeGuzzleSuccessResponse()
