@@ -7,7 +7,7 @@ use Illuminate\Support\Carbon;
 use Immeyti\WalletClient\Tests\FakeGuzzleClientResponses;
 use Immeyti\WalletClient\Wallet;
 
-class WalletTest extends \Tests\TestCase
+class WalletTest extends TestCase
 {
     use FakeGuzzleClientResponses;
 
