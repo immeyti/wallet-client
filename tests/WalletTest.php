@@ -69,8 +69,12 @@ class WalletTest extends \Tests\TestCase
 
         $this->assertTrue(is_array($allTransactions));
         $this->assertSame(
-            ['message' => "Cannot query field \"idsdf\" on type \"Transaction\"."],
-            $allTransactions);
+            $allTransactions,
+            [
+                'error' => true,
+                'message' => "Cannot query field \"idsdf\" on type \"Transaction\"."
+            ]
+        );
     }
 
     /** @test */
@@ -133,6 +137,24 @@ class WalletTest extends \Tests\TestCase
         $this->assertTrue($response['error']);
     }
 
+    /** @test */
+    public function itShouldSendDepositRequest()
+    {
+        $this->fakeGuzzleDepositResponse();
+        $userId = 1;
+        $coinType = 'BTC';
+        $amount = 0.001;
+
+        $response = $this->wallet->deposit($userId, $coinType, $amount);
+
+        $this->assertIsArray($response);
+        $this->assertSame($response, [
+            'user_id' => $userId,
+            'coin_type' => $coinType,
+            'balance' => $amount,
+            'blocked_balance' => 0
+        ]);
+    }
     public function fakeGuzzleSuccessResponse()
     {
         $expectedResponseBody = file_get_contents(__DIR__.'/stub/jsonTest.json');
@@ -166,6 +188,11 @@ class WalletTest extends \Tests\TestCase
     public function fakeGuzzleFailGraphqlResponse()
     {
         $expectedResponseBody = file_get_contents(__DIR__.'/stub/graphqlError.json');
+        $this->appendToHandler(200 , [], $expectedResponseBody);
+    }
+    public function fakeGuzzleDepositResponse()
+    {
+        $expectedResponseBody = file_get_contents(__DIR__.'/stub/deposit.json');
         $this->appendToHandler(200 , [], $expectedResponseBody);
     }
 

@@ -9,18 +9,28 @@ use GuzzleHttp\Psr7\Response;
 
 class Wallet
 {
-    private function request($endpoint, $method = 'GET', $body = '')
+    private function request($endpoint, $method = 'GET', $body = '', $type = 'graphql')
     {
         /** @var Client $client */
         $client = app(Client::class);
 
-        /** @var Response $response */
-        $response = $client->request($method, $endpoint, [
-            'headers' => [
-                'Content-Type' => 'application/json',
-            ],
-            'body' => $body
-        ]);
+        if ($type === 'grapql') {
+            /** @var Response $response */
+            $response = $client->request($method, $endpoint, [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+                'body' => $body
+            ]);
+        } else {
+            /** @var Response $response */
+            $response = $client->request($method, $endpoint, [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => $body
+            ]);
+        }
 
         $response = json_decode($response->getBody(), true);
 
@@ -93,6 +103,25 @@ class Wallet
            return $response['data']['allTransactions'];
         } catch (\Exception $e) {
             return  [
+                'error' => true,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    public function deposit($userId, $coinType, $amount)
+    {
+        $endPoint = 'wallet.test/api/v1/accounts/deposit';
+        $params = [
+            'user_id' => $userId,
+            'coin_type' => $coinType,
+            'amount' => $amount
+        ];
+
+        try {
+            return $this->request($endPoint, 'POST', $params, 'rest');
+        }catch (\Exception $e) {
+            return [
                 'error' => true,
                 'message' => $e->getMessage()
             ];
