@@ -1,6 +1,8 @@
 <?php
 
+
 namespace Immeyti\WalletClient\Tests;
+
 
 use Orchestra\Testbench\TestCase as Orchestra;
 
@@ -16,7 +18,7 @@ class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
-            \Immeyti\WalletClient\WalletClientServiceProvider::class,
+            \Asdf\Test\TestServiceProvider::class,
         ];
     }
 

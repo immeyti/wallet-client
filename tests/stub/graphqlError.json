@@ -1,0 +1,16 @@
+{
+    "errors": [
+        {
+            "message": "Cannot query field \"idsdf\" on type \"Transaction\".",
+            "extensions": {
+                "category": "graphql"
+            },
+            "locations": [
+                {
+                    "line": 4,
+                    "column": 5
+                }
+            ]
+        }
+    ]
+}

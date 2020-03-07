@@ -1,0 +1,33 @@
+{
+    "data": {
+        "allTransactions": [
+            {
+                "uuid": "b52982ba-864e-3c94-bdf6-19460a109fa7",
+                "id": "1",
+                "type": 2,
+                "for": "2",
+                "amount": 1,
+                "action_type": 3,
+                "created_at": "2020-02-18 13:43:06"
+            },
+            {
+                "uuid": "b52982ba-864e-3c94-bdf6-19460a109fa7",
+                "id": "2",
+                "type": 1,
+                "for": "2",
+                "amount": 0.1231911716,
+                "action_type": 1,
+                "created_at": "2020-02-18 13:43:06"
+            },
+            {
+                "uuid": "b52982ba-864e-3c94-bdf6-19460a109fa7",
+                "id": "3",
+                "type": 1,
+                "for": "1",
+                "amount": 0.252808452,
+                "action_type": 2,
+                "created_at": "2020-02-18 13:43:06"
+            }
+        ]
+    }
+}
