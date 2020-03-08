@@ -14,7 +14,7 @@
     ],
     "require": {
         "php": "^7.2",
-        "illuminate/support": "self.version",
+        "illuminate/support": "^7.0",
         "guzzlehttp/guzzle": "^6.5",
         "orchestra/testbench": "^4.0"
     },
