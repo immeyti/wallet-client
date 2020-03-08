@@ -9,10 +9,18 @@ use GuzzleHttp\Psr7\Response;
 
 class Wallet
 {
+    private $baseUrl;
+
+    public function __construct($baseUrl)
+    {
+        $this->baseUrl = $baseUrl;
+    }
+
     private function request($endpoint, $method = 'GET', $body = '', $type = 'graphql')
     {
         /** @var Client $client */
         $client = app(Client::class);
+        $endpoint = $this->baseUrl . $endpoint;
 
         if ($type === 'grapql') {
             /** @var Response $response */
@@ -56,7 +64,7 @@ class Wallet
             : $baseQuery;
 
         try {
-            $response = $this->request('wallet.test/graphql', 'POST', $graphQLquery);
+            $response = $this->request('/graphql', 'POST', $graphQLquery);
 
             return $response['data']['allTransactions'];
 
@@ -74,7 +82,7 @@ class Wallet
         $graphQLquery = str_replace('$uuid', '\"'.$uuid.'\"', $graphQLquery);
 
         try {
-            $response = $this->request('wallet.test/graphql', 'POST', $graphQLquery);
+            $response = $this->request('/graphql', 'POST', $graphQLquery);
 
             $account = $response['data']['allAccounts'];
 
@@ -98,7 +106,7 @@ class Wallet
         $graphQLquery = str_replace('$to', '\"'.$to.'\"', $graphQLquery);
 
         try {
-            $response = $this->request('wallet.test/graphql', 'POST', $graphQLquery);
+            $response = $this->request('/graphql', 'POST', $graphQLquery);
 
            return $response['data']['allTransactions'];
         } catch (\Exception $e) {
@@ -111,7 +119,7 @@ class Wallet
 
     public function deposit($userId, $coinType, $amount)
     {
-        $endPoint = 'wallet.test/api/v1/accounts/deposit';
+        $endPoint = '/api/v1/accounts/deposit';
         $params = [
             'user_id' => $userId,
             'coin_type' => $coinType,
@@ -130,7 +138,7 @@ class Wallet
 
     public function withdraw($userId, $coinType, $amount)
     {
-        $endPoint = 'wallet.test/api/v1/accounts/withdraw';
+        $endPoint = '/api/v1/accounts/withdraw';
         $params = [
             'user_id' => $userId,
             'coin_type' => $coinType,

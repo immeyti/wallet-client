@@ -17,7 +17,7 @@ class WalletTest extends TestCase
     {
         parent::__construct($name, $data, $dataName);
 
-        $this->wallet = new Wallet();
+        $this->wallet = new Wallet('wallet.test');
     }
 
     /** @test */
@@ -25,8 +25,7 @@ class WalletTest extends TestCase
     {
         $this->fakeGuzzleFailResponse();
 
-        $wallet = new Wallet();
-        $allTransactions = $wallet->allTransactions();
+        $allTransactions = $this->wallet->allTransactions();
 
         $this->assertTrue(is_array($allTransactions));
         $this->assertArrayHasKey('message', $allTransactions);
@@ -37,8 +36,7 @@ class WalletTest extends TestCase
     {
         $this->fakeGuzzleTransactionsResponse();
 
-        $wallet = new Wallet();
-        $allTransactions = $wallet->allTransactions();
+        $allTransactions = $this->wallet->allTransactions();
 
         $this->assertTrue(is_array($allTransactions));
         $this->assertTrue(key_exists('uuid', $allTransactions[0]));
@@ -52,8 +50,7 @@ class WalletTest extends TestCase
         $this->fakeGuzzleTransactionsResponse();
         $query = 'where: {column: UUID, operator: EQ, value: \"b52982ba-864e-3c94-bdf6-19460a109fa7\"}';
 
-        $wallet = new Wallet();
-        $allTransactions = $wallet->allTransactions($query);
+        $allTransactions = $this->wallet->allTransactions($query);
 
         $this->assertTrue(is_array($allTransactions));
         $this->assertArrayNotHasKey('error', $allTransactions);
@@ -64,8 +61,7 @@ class WalletTest extends TestCase
     {
         $this->fakeGuzzleFailGraphqlResponse();
 
-        $wallet = new Wallet();
-        $allTransactions = $wallet->allTransactions();
+        $allTransactions = $this->wallet->allTransactions();
 
         $this->assertTrue(is_array($allTransactions));
         $this->assertSame(
