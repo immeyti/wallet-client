@@ -88,6 +88,23 @@ class WalletTest extends TestCase
     }
 
     /** @test */
+    public function itShouldReturnUsersAccounts()
+    {
+        $this->fakeGuzzleUsersAccountsResponse();
+
+        $userId = 1;
+
+        $response = $this->wallet->accounts($userId);
+
+        $this->assertIsArray($response);
+        $this->assertEquals($response[0]['user_id'], $userId);
+        $this->assertArrayHasKey('transactions', $response[0]);
+        $this->assertArrayHasKey('uuid', $response[0]);
+        $this->assertArrayHasKey('transactions', $response[0]);
+        $this->assertIsArray($response[0]['transactions']);
+    }
+
+    /** @test */
     public function itShouldReturnErrorIfAccountNotFound()
     {
         $this->fakeGuzzleAnAccountNotFoundResponse();
@@ -176,6 +193,13 @@ class WalletTest extends TestCase
         $expectedResponseBody = file_get_contents(__DIR__.'/stub/jsonTest.json');
         $this->appendToHandler(200, [], $expectedResponseBody);
     }
+
+    public function fakeGuzzleUsersAccountsResponse()
+    {
+        $expectedResponseBody = file_get_contents(__DIR__.'/stub/userAccounts.json');
+        $this->appendToHandler(200, [], $expectedResponseBody);
+    }
+
     public function fakeGuzzleFailResponse()
     {
         $expectedResponseBody = file_get_contents(__DIR__.'/stub/jsonTest.json');

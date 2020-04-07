@@ -112,6 +112,33 @@ class Wallet
     }
 
     /**
+     * @param int  $userId
+     * @return array
+     */
+    public function accounts($userId)
+    {
+        $graphQLquery = '{"query": "query { allAccounts(where: {column: USERID, operator: EQ, value: $userId}) { uuid id user_id coin_type balance blocked_balance created_at transactions { id type for amount action_type created_at }} } "}';
+        $graphQLquery = str_replace('$userId', '\"'.$userId.'\"', $graphQLquery);
+
+        try {
+            $response = $this->request('/graphql', 'POST', $graphQLquery);
+
+            $accounts = $response['data']['allAccounts'];
+
+            if (empty($accounts))
+                throw new \Exception('account not found');
+
+            return $accounts;
+
+        } catch (\Exception $e) {
+            return  [
+                'error' => true,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
      * @param $from
      * @param $to
      * @return array
