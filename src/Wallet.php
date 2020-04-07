@@ -30,7 +30,7 @@ class Wallet
         $client = app(Client::class);
         $endpoint = $this->baseUrl . $endpoint;
 
-        if ($type === 'grapql') {
+        if ($type === 'graphql') {
             /** @var Response $response */
             $response = $client->request($method, $endpoint, [
                 'headers' => [
